@@ -15,7 +15,7 @@ export type BuiltInModelStatus =
   | { type: 'downloading', progress: number }
   | { type: 'available' }
   | { type: 'corrupted', file_size: number, expected_min_size: number }
-  | { type: 'error', Error: string };
+  | { type: 'error', error: string };
 
 // Helper functions for status handling
 export function isModelAvailable(status: BuiltInModelStatus): boolean {

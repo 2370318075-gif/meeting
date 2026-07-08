@@ -110,7 +110,7 @@ pub enum ModelStatus {
     Corrupted { file_size: u64, expected_min_size: u64 },
 
     /// Error occurred with the model
-    Error(String),
+    Error { error: String },
 }
 
 /// Model information for UI display
@@ -299,7 +299,9 @@ impl ModelManager {
                             model_def.name,
                             e
                         );
-                        ModelStatus::Error(format!("Failed to read metadata: {}", e))
+                        ModelStatus::Error {
+                            error: format!("Failed to read metadata: {}", e),
+                        }
                     }
                 }
             } else {
@@ -588,7 +590,9 @@ impl ModelManager {
                 {
                     let mut models = self.available_models.write().await;
                     if let Some(model_info) = models.get_mut(model_name) {
-                        model_info.status = ModelStatus::Error(error_msg.clone());
+                        model_info.status = ModelStatus::Error {
+                            error: error_msg.clone(),
+                        };
                     }
                 }
 
@@ -688,7 +692,9 @@ impl ModelManager {
                     {
                         let mut models = self.available_models.write().await;
                         if let Some(model_info) = models.get_mut(model_name) {
-                            model_info.status = ModelStatus::Error("Download timeout - No data received for 30 seconds".to_string());
+                            model_info.status = ModelStatus::Error {
+                                error: "Download timeout - No data received for 30 seconds".to_string(),
+                            };
                         }
                     }
 
@@ -724,7 +730,9 @@ impl ModelManager {
                             {
                                 let mut models = self.available_models.write().await;
                                 if let Some(model_info) = models.get_mut(model_name) {
-                                    model_info.status = ModelStatus::Error(error_msg.to_string());
+                                    model_info.status = ModelStatus::Error {
+                                        error: error_msg.to_string(),
+                                    };
                                 }
                             }
 
@@ -827,7 +835,9 @@ impl ModelManager {
             {
                 let mut models = self.available_models.write().await;
                 if let Some(model_info) = models.get_mut(model_name) {
-                    model_info.status = ModelStatus::Error(format!("Validation failed: {}", e));
+                    model_info.status = ModelStatus::Error {
+                        error: format!("Validation failed: {}", e),
+                    };
                 }
             }
 
@@ -964,5 +974,16 @@ mod tests {
         );
 
         assert!(rewritten.is_none());
+    }
+
+    #[test]
+    fn serializes_error_status_for_frontend() {
+        let value = serde_json::to_value(ModelStatus::Error {
+            error: "download failed".to_string(),
+        })
+            .expect("error status should serialize");
+
+        assert_eq!(value["type"], "error");
+        assert_eq!(value["error"], "download failed");
     }
 }

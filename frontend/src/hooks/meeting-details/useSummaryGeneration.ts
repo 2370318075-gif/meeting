@@ -573,7 +573,7 @@ export function useSummaryGeneration({
 
             if (status.type === 'corrupted' || status.type === 'error') {
               const errorDesc = status.type === 'error'
-                ? status.Error || '模型文件存在错误'
+                ? status.error || '模型文件存在错误'
                 : '模型文件已损坏';
               toast.error('内置 AI 模型不可用', {
                 description: `${errorDesc}。请检查模型设置。`,

@@ -448,8 +448,8 @@ export function BuiltInModelManager({
                 )}
                 {(isError || isCorrupted) && (
                   <p className="mb-1 text-xs text-red-600">
-                    {isError && typeof model.status === 'object' && 'Error' in model.status
-                      ? (model.status as any).Error
+                    {isError && model.status.error
+                      ? model.status.error
                       : isCorrupted
                       ? '文件已损坏。请重新下载或删除。'
                       : '发生错误'}

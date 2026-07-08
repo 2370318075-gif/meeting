@@ -155,7 +155,7 @@ export function SummaryGeneratorButtonGroup({
 
       if (status.type === 'error') {
         toast.error('模型出错', {
-          description: status.Error || '模型发生错误',
+          description: status.error || '模型发生错误',
           duration: 5000,
         });
         setSettingsDialogOpen(true);
