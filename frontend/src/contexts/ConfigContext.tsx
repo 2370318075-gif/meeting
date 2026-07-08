@@ -107,8 +107,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
   // Transcript model configuration state
   const [transcriptModelConfig, setTranscriptModelConfig] = useState<TranscriptModelProps>({
-    provider: 'parakeet',
-    model: 'parakeet-tdt-0.6b-v3-int8',
+    provider: 'senseVoice',
+    model: 'sensevoice-zh-en-ja-ko-yue-int8',
     apiKey: null
   });
 
@@ -140,9 +140,9 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const [selectedLanguage, setSelectedLanguage] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('primaryLanguage');
-      return saved || 'auto';
+      return saved || 'zh';
     }
-    return 'auto';
+    return 'zh';
   });
 
   // UI preferences state
@@ -199,8 +199,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
         if (config) {
           console.log('[ConfigContext] Loaded saved transcript config:', config);
           setTranscriptModelConfig({
-            provider: config.provider || 'parakeet',
-            model: config.model || 'parakeet-tdt-0.6b-v3-int8',
+            provider: config.provider || 'senseVoice',
+            model: config.model || 'sensevoice-zh-en-ja-ko-yue-int8',
             apiKey: config.apiKey || null
           });
         }

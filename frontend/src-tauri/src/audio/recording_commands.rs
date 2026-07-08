@@ -646,6 +646,31 @@ pub async fn stop_recording<R: Runtime>(
     };
 
     match config.as_deref() {
+        Some("senseVoice") => {
+            info!("🇨🇳 Unloading SenseVoice model...");
+            let engine_clone = {
+                let engine_guard = crate::sensevoice_engine::commands::SENSEVOICE_ENGINE
+                    .lock()
+                    .unwrap();
+                engine_guard.as_ref().cloned()
+            };
+
+            if let Some(engine) = engine_clone {
+                let current_model = engine
+                    .get_current_model()
+                    .await
+                    .unwrap_or_else(|| "unknown".to_string());
+                info!("Current SenseVoice model before unload: '{}'", current_model);
+
+                if engine.unload_model().await {
+                    info!("✅ SenseVoice model '{}' unloaded successfully", current_model);
+                } else {
+                    warn!("⚠️ Failed to unload SenseVoice model '{}'", current_model);
+                }
+            } else {
+                warn!("⚠️ No SenseVoice engine found to unload model");
+            }
+        }
         Some("parakeet") => {
             info!("🦜 Unloading Parakeet model...");
             let engine_clone = {

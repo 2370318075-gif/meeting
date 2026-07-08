@@ -4,8 +4,9 @@ use crate::audio::decoder::decode_audio_file;
 use crate::audio::vad::get_speech_chunks_with_progress;
 use super::common::{create_transcript_segments, split_segment_at_silence, write_transcripts_json};
 use super::constants::AUDIO_EXTENSIONS;
-use crate::config::{DEFAULT_WHISPER_MODEL, DEFAULT_PARAKEET_MODEL};
+use crate::config::{DEFAULT_PARAKEET_MODEL, DEFAULT_SENSEVOICE_MODEL, DEFAULT_WHISPER_MODEL};
 use crate::parakeet_engine::ParakeetEngine;
+use crate::sensevoice_engine::SenseVoiceEngine;
 use crate::state::AppState;
 use crate::whisper_engine::WhisperEngine;
 use anyhow::{anyhow, Result};
@@ -101,11 +102,11 @@ pub async fn start_retranscription<R: Runtime>(
     // Reset cancellation flag
     RETRANSCRIPTION_CANCELLED.store(false, Ordering::SeqCst);
 
-    let use_parakeet = provider.as_deref() == Some("parakeet");
+    let provider_for_unload = provider.clone().unwrap_or_else(|| "whisper".to_string());
     let result = run_retranscription(app.clone(), meeting_id.clone(), meeting_folder_path, language, model, provider).await;
 
     // Unload the engine after the batch job (success, failure, or cancellation)
-    super::common::unload_engine_after_batch(use_parakeet).await;
+    super::common::unload_engine_after_batch(&provider_for_unload).await;
 
     // Guard will automatically clear flag on drop
     // No need for manual: RETRANSCRIPTION_IN_PROGRESS.store(false, Ordering::SeqCst);
@@ -182,6 +183,7 @@ async fn run_retranscription<R: Runtime>(
 
     // Determine which provider to use (default to whisper)
     let use_parakeet = provider.as_deref() == Some("parakeet");
+    let use_sensevoice = matches!(provider.as_deref(), Some("senseVoice") | Some("sensevoice"));
 
     info!(
         "Starting retranscription for meeting {} with language {:?}, model {:?}, provider {:?}",
@@ -299,13 +301,18 @@ async fn run_retranscription<R: Runtime>(
     emit_progress(&app, &meeting_id, "transcribing", 25, "Loading transcription engine...");
 
     // Initialize the appropriate engine once (not per-segment)
-    let whisper_engine = if !use_parakeet {
+    let whisper_engine = if !use_parakeet && !use_sensevoice {
         Some(get_or_init_whisper(&app, model.as_deref()).await?)
     } else {
         None
     };
     let parakeet_engine = if use_parakeet {
         Some(get_or_init_parakeet(&app, model.as_deref()).await?)
+    } else {
+        None
+    };
+    let sensevoice_engine = if use_sensevoice {
+        Some(get_or_init_sensevoice(&app, model.as_deref()).await?)
     } else {
         None
     };
@@ -368,7 +375,14 @@ async fn run_retranscription<R: Runtime>(
         }
 
         // Transcribe this segment
-        let (text, conf) = if use_parakeet {
+        let (text, conf) = if use_sensevoice {
+            let engine = sensevoice_engine.as_ref().unwrap();
+            let text = engine
+                .transcribe_audio(segment.samples.clone())
+                .await
+                .map_err(|e| anyhow!("SenseVoice transcription failed on segment {}: {}", i, e))?;
+            (text, 0.9f32)
+        } else if use_parakeet {
             let engine = parakeet_engine.as_ref().unwrap();
             let text = engine
                 .transcribe_audio(segment.samples.clone())
@@ -678,6 +692,52 @@ async fn get_or_init_parakeet<R: Runtime>(
     }
 }
 
+/// Get or initialize the SenseVoice engine, auto-loading the model if needed
+async fn get_or_init_sensevoice<R: Runtime>(
+    app: &AppHandle<R>,
+    requested_model: Option<&str>,
+) -> Result<Arc<SenseVoiceEngine>> {
+    use crate::sensevoice_engine::commands::SENSEVOICE_ENGINE;
+
+    let engine = {
+        let guard = SENSEVOICE_ENGINE.lock().unwrap_or_else(|e| e.into_inner());
+        guard.as_ref().cloned()
+    };
+
+    match engine {
+        Some(e) => {
+            let target_model = match requested_model {
+                Some(model) => model.to_string(),
+                None => get_configured_sensevoice_model(app).await?,
+            };
+
+            let current_model = e.get_current_model().await;
+            let needs_load = match &current_model {
+                Some(loaded) => loaded != &target_model,
+                None => true,
+            };
+
+            if needs_load {
+                info!(
+                    "Loading SenseVoice model '{}' (current: {:?})",
+                    target_model, current_model
+                );
+
+                if let Err(discover_err) = e.discover_models().await {
+                    warn!("Error during SenseVoice model discovery (continuing anyway): {}", discover_err);
+                }
+
+                e.load_model(&target_model)
+                    .await
+                    .map_err(|e| anyhow!("Failed to load SenseVoice model '{}': {}", target_model, e))?;
+            }
+
+            Ok(e)
+        }
+        None => Err(anyhow!("SenseVoice engine not initialized")),
+    }
+}
+
 /// Get the configured Parakeet model name from the database
 async fn get_configured_parakeet_model<R: Runtime>(app: &AppHandle<R>) -> Result<String> {
     debug!("Getting configured Parakeet model from database...");
@@ -717,6 +777,25 @@ async fn get_configured_parakeet_model<R: Runtime>(app: &AppHandle<R>) -> Result
             warn!("No transcript config found, using default Parakeet model");
             Ok(DEFAULT_PARAKEET_MODEL.to_string())
         }
+    }
+}
+
+/// Get the configured SenseVoice model name from the database
+async fn get_configured_sensevoice_model<R: Runtime>(app: &AppHandle<R>) -> Result<String> {
+    let app_state = app
+        .try_state::<AppState>()
+        .ok_or_else(|| anyhow!("App state not available"))?;
+
+    let result: Option<(String, String)> = sqlx::query_as(
+        "SELECT provider, model FROM transcript_settings WHERE id = '1'"
+    )
+    .fetch_optional(app_state.db_manager.pool())
+    .await
+    .map_err(|e| anyhow!("Failed to query transcript config: {}", e))?;
+
+    match result {
+        Some((provider, model)) if provider == "senseVoice" || provider == "sensevoice" => Ok(model),
+        _ => Ok(DEFAULT_SENSEVOICE_MODEL.to_string()),
     }
 }
 

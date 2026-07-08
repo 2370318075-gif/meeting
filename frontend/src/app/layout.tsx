@@ -25,6 +25,7 @@ import { RecordingPostProcessingProvider } from '@/contexts/RecordingPostProcess
 import { ImportAudioDialog, ImportDropOverlay } from '@/components/ImportAudio'
 import { ImportDialogProvider } from '@/contexts/ImportDialogContext'
 import { isAudioExtension, getAudioFormatsDisplayList } from '@/constants/audioFormats'
+import { ChineseRuntimeLocalizer } from '@/components/ChineseRuntimeLocalizer'
 
 
 const sourceSans3 = Source_Sans_3({
@@ -231,8 +232,9 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={`${sourceSans3.variable} font-sans antialiased`}>
+        <ChineseRuntimeLocalizer />
         <AnalyticsProvider>
           <RecordingStateProvider>
             <TranscriptProvider>

@@ -49,6 +49,7 @@ pub mod anthropic;
 pub mod groq;
 pub mod openrouter;
 pub mod parakeet_engine;
+pub mod sensevoice_engine;
 pub mod state;
 pub mod summary;
 pub mod tray;
@@ -64,9 +65,9 @@ use tokio::sync::RwLock;
 
 static RECORDING_FLAG: AtomicBool = AtomicBool::new(false);
 
-// Global language preference storage (default to "auto-translate" for automatic translation to English)
+// Global language preference storage. The Chinese build defaults to Simplified Chinese.
 static LANGUAGE_PREFERENCE: std::sync::LazyLock<StdMutex<String>> =
-    std::sync::LazyLock::new(|| StdMutex::new("auto-translate".to_string()));
+    std::sync::LazyLock::new(|| StdMutex::new("zh".to_string()));
 
 #[derive(Debug, Deserialize)]
 struct RecordingArgs {
@@ -471,6 +472,16 @@ pub fn run() {
                 }
             });
 
+            // Set SenseVoice models directory
+            sensevoice_engine::commands::set_models_directory(&_app.handle());
+
+            // Initialize SenseVoice engine on startup
+            tauri::async_runtime::spawn(async {
+                if let Err(e) = sensevoice_engine::commands::sensevoice_init().await {
+                    log::error!("Failed to initialize SenseVoice engine on startup: {}", e);
+                }
+            });
+
             // Initialize ModelManager for summary engine (async, non-blocking)
             let app_handle_for_model_manager = _app.handle().clone();
             tauri::async_runtime::spawn(async move {
@@ -582,6 +593,18 @@ pub fn run() {
             parakeet_engine::commands::parakeet_cancel_download,
             parakeet_engine::commands::parakeet_delete_corrupted_model,
             parakeet_engine::commands::open_parakeet_models_folder,
+            // SenseVoice engine commands
+            sensevoice_engine::commands::sensevoice_init,
+            sensevoice_engine::commands::sensevoice_get_available_models,
+            sensevoice_engine::commands::sensevoice_load_model,
+            sensevoice_engine::commands::sensevoice_get_current_model,
+            sensevoice_engine::commands::sensevoice_is_model_loaded,
+            sensevoice_engine::commands::sensevoice_has_available_models,
+            sensevoice_engine::commands::sensevoice_validate_model_ready,
+            sensevoice_engine::commands::sensevoice_transcribe_audio,
+            sensevoice_engine::commands::sensevoice_get_models_directory,
+            sensevoice_engine::commands::sensevoice_download_model,
+            sensevoice_engine::commands::open_sensevoice_models_folder,
             // Parallel processing commands
             whisper_engine::parallel_commands::initialize_parallel_processor,
             whisper_engine::parallel_commands::start_parallel_processing,

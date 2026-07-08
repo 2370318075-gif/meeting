@@ -3,6 +3,7 @@
 // TranscriptionEngine enum and model initialization/validation logic.
 
 use super::provider::TranscriptionProvider;
+use super::sensevoice_provider::SenseVoiceProvider;
 use log::{info, warn};
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, Runtime};
@@ -69,18 +70,18 @@ pub async fn validate_transcription_model_ready<R: Runtime>(app: &AppHandle<R>) 
             config
         }
         Ok(None) => {
-            info!("📝 No transcript config found, defaulting to parakeet");
+            info!("📝 No transcript config found, defaulting to SenseVoice");
             crate::api::api::TranscriptConfig {
-                provider: "parakeet".to_string(),
-                model: crate::config::DEFAULT_PARAKEET_MODEL.to_string(),
+                provider: "senseVoice".to_string(),
+                model: crate::config::DEFAULT_SENSEVOICE_MODEL.to_string(),
                 api_key: None,
             }
         }
         Err(e) => {
-            warn!("⚠️ Failed to get transcript config: {}, defaulting to parakeet", e);
+            warn!("⚠️ Failed to get transcript config: {}, defaulting to SenseVoice", e);
             crate::api::api::TranscriptConfig {
-                provider: "parakeet".to_string(),
-                model: crate::config::DEFAULT_PARAKEET_MODEL.to_string(),
+                provider: "senseVoice".to_string(),
+                model: crate::config::DEFAULT_SENSEVOICE_MODEL.to_string(),
                 api_key: None,
             }
         }
@@ -135,10 +136,31 @@ pub async fn validate_transcription_model_ready<R: Runtime>(app: &AppHandle<R>) 
                 }
             }
         }
+        "senseVoice" => {
+            info!("🔍 Validating SenseVoice model...");
+            if let Err(init_error) = crate::sensevoice_engine::commands::sensevoice_init().await {
+                warn!("❌ Failed to initialize SenseVoice engine: {}", init_error);
+                return Err(format!(
+                    "Failed to initialize SenseVoice speech recognition: {}",
+                    init_error
+                ));
+            }
+
+            match crate::sensevoice_engine::commands::sensevoice_validate_model_ready_with_config(app).await {
+                Ok(model_name) => {
+                    info!("✅ SenseVoice model validation successful: {} is ready", model_name);
+                    Ok(())
+                }
+                Err(e) => {
+                    warn!("❌ SenseVoice model validation failed: {}", e);
+                    Err(e)
+                }
+            }
+        }
         other => {
             warn!("❌ Unsupported transcription provider for local recording: {}", other);
             Err(format!(
-                "Provider '{}' is not supported for local transcription. Please select 'localWhisper' or 'parakeet'.",
+                "Provider '{}' is not supported for local transcription. Please select 'senseVoice', 'localWhisper', or 'parakeet'.",
                 other
             ))
         }
@@ -165,18 +187,18 @@ pub async fn get_or_init_transcription_engine<R: Runtime>(
             config
         }
         Ok(None) => {
-            info!("📝 No transcript config found, defaulting to parakeet");
+            info!("📝 No transcript config found, defaulting to SenseVoice");
             crate::api::api::TranscriptConfig {
-                provider: "parakeet".to_string(),
-                model: crate::config::DEFAULT_PARAKEET_MODEL.to_string(),
+                provider: "senseVoice".to_string(),
+                model: crate::config::DEFAULT_SENSEVOICE_MODEL.to_string(),
                 api_key: None,
             }
         }
         Err(e) => {
-            warn!("⚠️ Failed to get transcript config: {}, defaulting to parakeet", e);
+            warn!("⚠️ Failed to get transcript config: {}, defaulting to SenseVoice", e);
             crate::api::api::TranscriptConfig {
-                provider: "parakeet".to_string(),
-                model: crate::config::DEFAULT_PARAKEET_MODEL.to_string(),
+                provider: "senseVoice".to_string(),
+                model: crate::config::DEFAULT_SENSEVOICE_MODEL.to_string(),
                 api_key: None,
             }
         }
@@ -209,6 +231,32 @@ pub async fn get_or_init_transcription_engine<R: Runtime>(
                 }
                 None => {
                     Err("Parakeet engine not initialized. This should not happen after validation.".to_string())
+                }
+            }
+        }
+        "senseVoice" => {
+            info!("🇨🇳 Initializing SenseVoice transcription engine");
+
+            let engine = {
+                let guard = crate::sensevoice_engine::commands::SENSEVOICE_ENGINE
+                    .lock()
+                    .unwrap();
+                guard.as_ref().cloned()
+            };
+
+            match engine {
+                Some(engine) => {
+                    if engine.is_model_loaded().await {
+                        let model_name = engine.get_current_model().await
+                            .unwrap_or_else(|| "unknown".to_string());
+                        info!("✅ SenseVoice model '{}' already loaded", model_name);
+                        Ok(TranscriptionEngine::Provider(Arc::new(SenseVoiceProvider::new(engine))))
+                    } else {
+                        Err("SenseVoice engine initialized but no model loaded. This should not happen after validation.".to_string())
+                    }
+                }
+                None => {
+                    Err("SenseVoice engine not initialized. This should not happen after validation.".to_string())
                 }
             }
         }

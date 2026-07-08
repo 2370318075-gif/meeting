@@ -170,12 +170,13 @@ export function ImportAudioDialog({
     return availableModels.find((m) => m.provider === provider && m.name === name);
   }, [selectedModelKey, availableModels]);
   const isParakeetModel = selectedModel?.provider === 'parakeet';
+  const isSenseVoiceModel = selectedModel?.provider === 'sensevoice';
 
   useEffect(() => {
-    if (isParakeetModel && selectedLang !== 'auto') {
+    if ((isParakeetModel || isSenseVoiceModel) && selectedLang !== 'auto') {
       setSelectedLang('auto');
     }
-  }, [isParakeetModel, selectedLang]);
+  }, [isParakeetModel, isSenseVoiceModel, selectedLang]);
 
   const handleSelectFile = async () => {
     const info = await selectFile();
@@ -343,15 +344,15 @@ export function ImportAudioDialog({
                   {showAdvanced && (
                     <div className="p-3 pt-0 space-y-4 border-t">
                       {/* Language selector */}
-                      {!isParakeetModel ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Language</span>
-                          </div>
-                          <Select value={selectedLang} onValueChange={setSelectedLang}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select language" />
+                        {!isParakeetModel && !isSenseVoiceModel ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">语言</span>
+                            </div>
+                            <Select value={selectedLang} onValueChange={setSelectedLang}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="选择语言" />
                             </SelectTrigger>
                             <SelectContent className="max-h-60">
                               {LANGUAGES.map((lang) => (
@@ -363,31 +364,33 @@ export function ImportAudioDialog({
                           </Select>
                         </div>
                       ) : (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Language</span>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">语言</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {isSenseVoiceModel
+                                ? 'SenseVoice 已固定为中文优先转写。'
+                                : 'Parakeet 不支持手动选择语言，会自动识别。'}
+                            </p>
                           </div>
-                          <p className="text-xs text-muted-foreground">
-                            Language selection isn't supported for Parakeet. It always uses automatic detection.
-                          </p>
-                        </div>
-                      )}
+                        )}
 
                       {/* Model selector */}
                       {availableModels.length > 0 && (
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Cpu className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Model</span>
-                          </div>
+                            <div className="flex items-center gap-2">
+                              <Cpu className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-medium">模型</span>
+                            </div>
                           <Select
                             value={selectedModelKey}
                             onValueChange={setSelectedModelKey}
                             disabled={loadingModels}
                           >
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder={loadingModels ? 'Loading models...' : 'Select model'} />
+                              <SelectValue placeholder={loadingModels ? '正在加载模型...' : '选择模型'} />
                             </SelectTrigger>
                             <SelectContent>
                               {availableModels.map((model) => (

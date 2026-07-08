@@ -31,11 +31,11 @@ export interface SummaryLanguageDetectionResult {
 }
 
 export function readPinnedSummaryLanguageDefault(): string | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') return 'zh';
   try {
-    return normaliseLanguageCode(window.localStorage.getItem(SUMMARY_LANGUAGE_DEFAULT_KEY));
+    return normaliseLanguageCode(window.localStorage.getItem(SUMMARY_LANGUAGE_DEFAULT_KEY)) ?? 'zh';
   } catch {
-    return null;
+    return 'zh';
   }
 }
 
