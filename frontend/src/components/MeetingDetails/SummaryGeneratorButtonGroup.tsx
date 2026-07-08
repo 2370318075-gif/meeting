@@ -201,7 +201,7 @@ export function SummaryGeneratorButtonGroup({
       if (!models || models.length === 0) {
         // No models available, show message and open settings
         toast.error(
-          'No Ollama models found. Please download gemma2:2b from Model Settings.',
+          '未找到 Ollama 模型。请在模型设置中下载 gemma2:2b。',
           { duration: 5000 }
         );
         setSettingsDialogOpen(true);
@@ -271,21 +271,21 @@ export function SummaryGeneratorButtonGroup({
           disabled={isCheckingModels || isModelConfigLoading}
           title={
             isModelConfigLoading
-              ? 'Loading model configuration...'
+              ? '正在加载模型配置...'
               : isCheckingModels
-                ? 'Checking models...'
-                : hasSummary ? 'Regenerate AI Summary' : 'Generate AI Summary'
+                ? '正在检查模型...'
+                : hasSummary ? '重新生成 AI 摘要' : '生成 AI 摘要'
           }
         >
           {isCheckingModels || isModelConfigLoading ? (
             <>
               <Loader2 className="animate-spin xl:mr-2" size={18} />
-              <span className="hidden xl:inline">Processing...</span>
+              <span className="hidden xl:inline">处理中...</span>
             </>
           ) : (
             <>
               <Sparkles className="xl:mr-2" size={18} />
-              <span className="hidden lg:inline xl:inline">{hasSummary ? 'Regenerate Summary' : 'Generate Summary'}</span>
+              <span className="hidden lg:inline xl:inline">{hasSummary ? '重新生成摘要' : '生成摘要'}</span>
             </>
           )}
         </Button>
@@ -302,14 +302,14 @@ export function SummaryGeneratorButtonGroup({
             title="Summary Settings"
           >
             <Settings />
-            <span className="hidden lg:inline">AI Model</span>
+            <span className="hidden lg:inline">AI 模型</span>
           </Button>
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
         >
           <VisuallyHidden>
-            <DialogTitle>Model Settings</DialogTitle>
+            <DialogTitle>模型设置</DialogTitle>
           </VisuallyHidden>
           <ModelSettingsModal
             onSave={async (config) => {

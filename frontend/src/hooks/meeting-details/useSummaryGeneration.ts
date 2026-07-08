@@ -428,7 +428,7 @@ export function useSummaryGeneration({
       return allData.transcripts;
     } catch (error) {
       console.error('❌ Error fetching all transcripts:', error);
-      toast.error('Failed to fetch transcripts for summary generation');
+      toast.error('获取摘要转写内容失败');
       return [];
     }
   }, []);
@@ -457,7 +457,7 @@ export function useSummaryGeneration({
     // Check if model config is still loading
     if (isModelConfigLoading) {
       console.log('⏳ Model configuration is still loading, please wait...');
-      toast.info('Loading model configuration, please wait...');
+      toast.info('正在加载模型配置，请稍候...');
       return;
     }
 
@@ -466,7 +466,7 @@ export function useSummaryGeneration({
     const allTranscripts = await fetchAllTranscripts(meeting.id);
 
     if (!allTranscripts.length) {
-      const error_msg = 'No transcripts available for summary';
+      const error_msg = '暂无可用于生成摘要的转写内容';
       console.log(error_msg);
       toast.error(error_msg);
       return;
@@ -488,7 +488,7 @@ export function useSummaryGeneration({
 
         if (!models || models.length === 0) {
           toast.error(
-            'No Ollama models found. Please download gemma3:1b from Model Settings.',
+            '未找到 Ollama 模型。请在模型设置中下载 gemma3:1b。',
             { duration: 5000 }
           );
           return;
@@ -622,7 +622,7 @@ export function useSummaryGeneration({
 
     if (!allTranscripts.length) {
       console.error('No transcripts available for regeneration');
-      toast.error('No transcripts available for summary regeneration');
+      toast.error('暂无可用于重新生成摘要的转写内容');
       return;
     }
 

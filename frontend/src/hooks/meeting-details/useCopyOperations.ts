@@ -51,7 +51,7 @@ export function useCopyOperations({
       return allData.transcripts;
     } catch (error) {
       console.error('❌ Error fetching all transcripts:', error);
-      toast.error('Failed to fetch transcripts for copying');
+      toast.error('获取可复制的转写内容失败');
       return [];
     }
   }, []);
@@ -63,7 +63,7 @@ export function useCopyOperations({
     const allTranscripts = await fetchAllTranscripts(meeting.id);
 
     if (!allTranscripts.length) {
-      const error_msg = 'No transcripts available to copy';
+      const error_msg = '暂无可复制的转写内容';
       console.log(error_msg);
       toast.error(error_msg);
       return;

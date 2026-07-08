@@ -62,11 +62,11 @@ export function TranscriptPanel({
                     variant="outline"
                     size="sm"
                     onClick={copyTranscript}
-                    title="Copy Transcript"
+                    title="复制转写内容"
                   >
                     <Copy />
                     <span className='hidden md:inline'>
-                      Copy
+                      复制
                     </span>
                   </Button>
                 )}

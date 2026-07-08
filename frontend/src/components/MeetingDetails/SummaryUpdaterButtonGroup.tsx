@@ -64,7 +64,7 @@ export function SummaryUpdaterButtonGroup({
         className="cursor-pointer"
       >
         <Copy />
-        <span className="hidden lg:inline">Copy</span>
+        <span className="hidden lg:inline">复制</span>
       </Button>
 
       {/* Find button */}

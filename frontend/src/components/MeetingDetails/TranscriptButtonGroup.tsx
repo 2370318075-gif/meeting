@@ -48,10 +48,10 @@ export function TranscriptButtonGroup({
             onCopyTranscript();
           }}
           disabled={transcriptCount === 0}
-          title={transcriptCount === 0 ? 'No transcript available' : 'Copy Transcript'}
+          title={transcriptCount === 0 ? '暂无可用转写内容' : '复制转写内容'}
         >
           <Copy />
-          <span className="hidden lg:inline">Copy</span>
+          <span className="hidden lg:inline">复制</span>
         </Button>
 
         <Button

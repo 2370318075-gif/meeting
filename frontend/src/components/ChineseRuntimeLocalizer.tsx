@@ -19,6 +19,7 @@ const TEXT_TRANSLATIONS: Record<string, string> = {
   'Meeting Notes': '会议笔记',
   'Copy': '复制',
   'Copy Transcript': '复制转写内容',
+  'No transcript available': '暂无可用转写内容',
   'Language': '语言',
   'Transcription Language': '转写语言',
   'Summary Language': '摘要语言',
@@ -112,6 +113,7 @@ const TEXT_TRANSLATIONS: Record<string, string> = {
   'Meeting recovered successfully!': '会议已成功恢复！',
   'Meeting deleted successfully': '会议删除成功',
   'All associated data has been removed': '所有关联数据已删除',
+  'Recording saved successfully!': '录制已成功保存！',
   'Transcripts and audio recovered': '转写内容和音频已恢复',
   'Transcripts recovered (no audio available)': '转写内容已恢复（无可用音频）',
   'View Meeting': '查看会议',
@@ -198,10 +200,27 @@ const TEXT_TRANSLATIONS: Record<string, string> = {
   'Local Whisper (High Accuracy)': 'Local Whisper（高准确率）',
   'Auto Summary': '自动摘要',
   'Auto Generating summary after meeting completion(Stopping)': '会议结束（停止录制）后自动生成摘要',
+  'No Summary Generated Yet': '暂未生成摘要',
+  'Generate an AI-powered summary of your meeting transcript to get key points, action items, and decisions.': '生成 AI 会议摘要，快速提取关键要点、行动项和决策内容。',
+  'Generate Summary': '生成摘要',
+  'Regenerate Summary': '重新生成摘要',
+  'Generate AI Summary': '生成 AI 摘要',
+  'Regenerate AI Summary': '重新生成 AI 摘要',
+  'Generating...': '正在生成...',
+  'Processing...': '处理中...',
+  'Loading model configuration...': '正在加载模型配置...',
+  'Checking models...': '正在检查模型...',
+  'Please select a model in Settings first': '请先在设置中选择模型',
+  'AI Model': 'AI 模型',
+  'Add context for AI summary. For example people involved, meeting overview, objective etc...': '为 AI 摘要补充上下文，例如参会人员、会议概述、会议目标等...',
+  'No Ollama models found. Please download gemma3:1b from Model Settings.': '未找到 Ollama 模型。请在模型设置中下载 gemma3:1b。',
+  'No Ollama models found. Please download gemma2:2b from Model Settings.': '未找到 Ollama 模型。请在模型设置中下载 gemma2:2b。',
   'Summary Model Configuration': '摘要模型配置',
   'Configure the AI model used for generating meeting summaries.': '配置用于生成会议摘要的 AI 模型。',
   'Model Settings': '模型设置',
   'Summarization Model': '摘要模型',
+  'Speech Recognition Setup Required': '需要设置语音识别',
+  'Transcription Model Settings': '转写模型设置',
   'Built-in AI': '内置 AI',
   'Built-in AI (Offline, No API needed)': '内置 AI（离线，无需 API）',
   'Built-in AI Models': '内置 AI 模型',
@@ -312,6 +331,11 @@ function translated(value: string): string | null {
   const recordingTimestampMatch = normalized.match(/^Recordings are saved with timestamp: recording_YYYYMMDD_HHMMSS\.(.+)$/);
   if (recordingTimestampMatch) {
     return `录音会按时间戳保存：recording_YYYYMMDD_HHMMSS.${recordingTimestampMatch[1]}`;
+  }
+
+  const transcriptSegmentsSavedMatch = normalized.match(/^(\d+) transcript segments saved\.$/);
+  if (transcriptSegmentsSavedMatch) {
+    return `已保存 ${transcriptSegmentsSavedMatch[1]} 条转写片段。`;
   }
 
   const providerDescriptorMatch = normalized.match(/^(.+) \((Recommended - Real-time \/ Accurate|High Accuracy)\)$/);

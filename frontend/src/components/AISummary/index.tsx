@@ -685,14 +685,14 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
             onClick={handleCopyBlocks}
           >
             <span className="text-gray-600">📋</span>
-            <span>Copy {selectedBlocks.length > 1 ? `${selectedBlocks.length} blocks` : 'block'}</span>
+            <span>{selectedBlocks.length > 1 ? `复制 ${selectedBlocks.length} 个块` : '复制块'}</span>
           </button>
           <button
             className="w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600 flex items-center space-x-2"
             onClick={handleDeleteBlocks}
           >
             <span>🗑️</span>
-            <span>Delete {selectedBlocks.length > 1 ? `${selectedBlocks.length} blocks` : 'block'}</span>
+            <span>{selectedBlocks.length > 1 ? `删除 ${selectedBlocks.length} 个块` : '删除块'}</span>
           </button>
         </div>
       )}
@@ -775,17 +775,17 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
             className="px-2 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md flex items-center space-x-1"
           >
             <span>📋</span>
-            <span>Copy</span>
+            <span>复制</span>
           </button>
           <button
             onClick={onRegenerateSummary}
             className="px-2 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md flex items-center space-x-1"
-            title="Regenerate Summary"
+            title="重新生成摘要"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span className="ml-1">Regenerate</span>
+            <span className="ml-1">重新生成</span>
           </button>
         </div>
       </div> */}

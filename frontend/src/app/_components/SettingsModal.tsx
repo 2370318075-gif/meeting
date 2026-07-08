@@ -84,11 +84,11 @@ export function SettingsModals({
 
             {/* Divider */}
             <div className="border-t pt-8">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">AI Model Configuration</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">AI 模型配置</h4>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Summarization Model
+                    摘要模型
                   </label>
                   <div className="flex space-x-2">
                     <select
@@ -248,7 +248,7 @@ export function SettingsModals({
           {/* Fixed Header */}
           <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              {messages.modelSelector ? 'Speech Recognition Setup Required' : 'Transcription Model Settings'}
+              {messages.modelSelector ? '需要设置语音识别' : '转写模型设置'}
             </h3>
             <button
               onClick={() => onClose('modelSelector')}

@@ -323,10 +323,10 @@ export function useRecordingStop(
           setStatus(RecordingStatus.COMPLETED);
 
           // Show success toast with navigation option
-          toast.success('Recording saved successfully!', {
-            description: `${freshTranscripts.length} transcript segments saved.`,
+          toast.success('录制已成功保存！', {
+            description: `已保存 ${freshTranscripts.length} 条转写片段。`,
             action: {
-              label: 'View Meeting',
+              label: '查看会议',
               onClick: () => {
                 router.push(`/meeting-details?id=${meetingId}`);
                 Analytics.trackButtonClick('view_meeting_from_toast', 'recording_complete');
