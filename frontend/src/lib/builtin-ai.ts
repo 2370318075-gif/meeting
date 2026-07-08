@@ -51,12 +51,12 @@ export function getStatusColor(status: BuiltInModelStatus): string {
 
 export function getStatusLabel(status: BuiltInModelStatus): string {
   switch (status.type) {
-    case 'available': return 'Available';
-    case 'downloading': return `Downloading ${status.progress}%`;
-    case 'not_downloaded': return 'Not Downloaded';
-    case 'corrupted': return 'Corrupted';
-    case 'error': return 'Error';
-    default: return 'Unknown';
+    case 'available': return '可用';
+    case 'downloading': return `正在下载 ${status.progress}%`;
+    case 'not_downloaded': return '未下载';
+    case 'corrupted': return '已损坏';
+    case 'error': return '错误';
+    default: return '未知';
   }
 }
 

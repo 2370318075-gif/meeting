@@ -30,12 +30,12 @@ export function SetupOverviewStep() {
     {
       number: 1,
       type: 'transcription',
-      title: 'Download Transcription Engine',
+      title: '下载转写引擎',
     },
     {
       number: 2,
       type: 'summarization',
-      title: 'Download Summarization Engine',
+      title: '下载摘要引擎',
     },
   ];
 
@@ -45,8 +45,8 @@ export function SetupOverviewStep() {
 
   return (
     <OnboardingContainer
-      title="Setup Overview"
-      description="Meetily requires that you download the Transcription & Summarization AI models for the software to work."
+      title="设置概览"
+      description="Meetily 需要先下载转写和摘要 AI 模型，才能完整使用本机会议转写与摘要功能。"
       step={2}
       totalSteps={isMac ? 4 : 3}
     >
@@ -62,7 +62,7 @@ export function SetupOverviewStep() {
                 >
                   <div className="flex-1 ml-1">
                     <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                        Step {step.number} :  {step.title}
+                        步骤 {step.number}：{step.title}
 
                         {step.type === "summarization" && (
                             <TooltipProvider>
@@ -73,8 +73,7 @@ export function SetupOverviewStep() {
                                 </button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm">
-                                You can also select external AI providers like OpenAI, Claude, or
-                                Ollama for summary generation in settings.
+                                你也可以稍后在设置中选择 OpenAI、Claude、Ollama 等外部 AI 提供方来生成摘要。
                                 </TooltipContent>
                             </Tooltip>
                             </TooltipProvider>
@@ -94,7 +93,7 @@ export function SetupOverviewStep() {
             onClick={handleContinue}
             className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white"
           >
-            Let's Go
+            开始设置
           </Button>
           <div className="text-center">
             <a
@@ -103,7 +102,7 @@ export function SetupOverviewStep() {
               rel="noopener noreferrer"
               className="text-xs text-gray-600 hover:underline"
             >
-              Report issues on GitHub
+              在 GitHub 反馈问题
             </a>
           </div>
         </div>

@@ -309,7 +309,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
             totalMb: total_mb ?? 0,
             speedMbps: speed_mbps ?? 0,
           });
-          if (status === 'completed' || progress >= 100) {
+          if (status === 'completed') {
             setSummaryModelDownloaded(true);
           }
         }

@@ -16,6 +16,44 @@ use tokio::time::timeout;
 
 use super::models::{get_available_models, get_model_by_name};
 
+fn push_unique_url(urls: &mut Vec<String>, url: String) {
+    if !url.is_empty() && !urls.iter().any(|existing| existing == &url) {
+        urls.push(url);
+    }
+}
+
+fn rewrite_huggingface_url(download_url: &str, endpoint: &str) -> Option<String> {
+    let endpoint = endpoint.trim().trim_end_matches('/');
+    if endpoint.is_empty() {
+        return None;
+    }
+
+    let rest = download_url
+        .strip_prefix("https://huggingface.co/")
+        .or_else(|| download_url.strip_prefix("http://huggingface.co/"))?;
+
+    Some(format!("{}/{}", endpoint, rest))
+}
+
+fn resolve_download_urls(download_url: &str) -> Vec<String> {
+    let mut urls = Vec::new();
+
+    for env_key in ["MEETILY_HF_ENDPOINT", "HF_ENDPOINT"] {
+        if let Ok(endpoint) = std::env::var(env_key) {
+            if let Some(url) = rewrite_huggingface_url(download_url, &endpoint) {
+                push_unique_url(&mut urls, url);
+            }
+        }
+    }
+
+    if let Some(url) = rewrite_huggingface_url(download_url, "https://hf-mirror.com") {
+        push_unique_url(&mut urls, url);
+    }
+
+    push_unique_url(&mut urls, download_url.to_string());
+    urls
+}
+
 // ============================================================================
 // Model Status Types
 // ============================================================================
@@ -451,7 +489,8 @@ impl ModelManager {
             }
         }
 
-        log::info!("Downloading from: {}", model_def.download_url);
+        let download_urls = resolve_download_urls(&model_def.download_url);
+        log::info!("Download sources for '{}': {:?}", model_name, download_urls);
         log::info!("Saving to: {}", file_path.display());
 
         // Create models directory if needed
@@ -478,38 +517,86 @@ impl ModelManager {
             .build()
             .map_err(|e| anyhow!("Failed to create HTTP client: {}", e))?;
 
-        // Build request with Range header if resuming
-        let mut request = client.get(&model_def.download_url);
-        if existing_size > 0 {
-            log::info!(
-                "Resuming download from byte {} ({:.1} MB)",
-                existing_size,
-                existing_size as f64 / (1024.0 * 1024.0)
-            );
-            request = request.header("Range", format!("bytes={}-", existing_size));
+        let mut response = None;
+        let mut total_size = 0;
+        let mut resuming = false;
+        let mut last_error: Option<String> = None;
+
+        for url in &download_urls {
+            log::info!("Attempting model download from: {}", url);
+            let mut request = client.get(url);
+            if existing_size > 0 {
+                log::info!(
+                    "Resuming download from byte {} ({:.1} MB)",
+                    existing_size,
+                    existing_size as f64 / (1024.0 * 1024.0)
+                );
+                request = request.header("Range", format!("bytes={}-", existing_size));
+            }
+
+            let candidate = match request.send().await {
+                Ok(response) => response,
+                Err(e) => {
+                    let msg = format!("Failed to start download from {}: {}", url, e);
+                    log::warn!("{}", msg);
+                    last_error = Some(msg);
+                    continue;
+                }
+            };
+
+            if candidate.status() == reqwest::StatusCode::PARTIAL_CONTENT {
+                let remaining = candidate.content_length().unwrap_or(0);
+                log::info!(
+                    "Server supports resume from {}, {} MB remaining",
+                    url,
+                    remaining / (1024 * 1024)
+                );
+                total_size = existing_size + remaining;
+                resuming = true;
+                response = Some(candidate);
+                break;
+            } else if candidate.status().is_success() {
+                if existing_size > 0 {
+                    log::warn!(
+                        "Server {} doesn't support resume, starting fresh download",
+                        url
+                    );
+                }
+                total_size = candidate.content_length().unwrap_or(0);
+                resuming = false;
+                response = Some(candidate);
+                break;
+            } else {
+                let msg = format!(
+                    "Download from {} failed with status: {}",
+                    url,
+                    candidate.status()
+                );
+                log::warn!("{}", msg);
+                last_error = Some(msg);
+            }
         }
 
-        let response = request
-            .send()
-            .await
-            .map_err(|e| anyhow!("Failed to start download: {}", e))?;
+        let response = match response {
+            Some(response) => response,
+            None => {
+                let mut active = self.active_downloads.write().await;
+                active.remove(model_name);
 
-        // Check response status - 200 OK (full download) or 206 Partial Content (resume)
-        let (total_size, resuming) = if response.status() == reqwest::StatusCode::PARTIAL_CONTENT {
-            // Server supports resume - total size = existing + remaining
-            let remaining = response.content_length().unwrap_or(0);
-            log::info!("Server supports resume, {} MB remaining", remaining / (1024 * 1024));
-            (existing_size + remaining, true)
-        } else if response.status().is_success() {
-            // Server doesn't support resume or fresh download
-            if existing_size > 0 {
-                log::warn!("Server doesn't support resume, starting fresh download");
+                let error_msg =
+                    last_error.unwrap_or_else(|| "No download source succeeded".to_string());
+                {
+                    let mut models = self.available_models.write().await;
+                    if let Some(model_info) = models.get_mut(model_name) {
+                        model_info.status = ModelStatus::Error(error_msg.clone());
+                    }
+                }
+
+                return Err(anyhow!(
+                    "Download failed from all configured sources. Last error: {}",
+                    error_msg
+                ));
             }
-            (response.content_length().unwrap_or(0), false)
-        } else {
-            let mut active = self.active_downloads.write().await;
-            active.remove(model_name);
-            return Err(anyhow!("Download failed with status: {}", response.status()));
         };
 
         log::info!("Total size: {} MB", total_size / (1024 * 1024));
@@ -847,5 +934,35 @@ impl ModelManager {
     /// Get models directory path
     pub fn get_models_directory(&self) -> PathBuf {
         self.models_dir.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rewrites_huggingface_url_to_custom_endpoint() {
+        let rewritten = rewrite_huggingface_url(
+            "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf",
+            "https://hf-mirror.com/",
+        );
+
+        assert_eq!(
+            rewritten.as_deref(),
+            Some(
+                "https://hf-mirror.com/unsloth/Qwen3.5-4B-GGUF/resolve/main/Qwen3.5-4B-Q4_K_M.gguf"
+            )
+        );
+    }
+
+    #[test]
+    fn leaves_non_huggingface_urls_unrewritten() {
+        let rewritten = rewrite_huggingface_url(
+            "https://example.com/models/model.gguf",
+            "https://hf-mirror.com",
+        );
+
+        assert!(rewritten.is_none());
     }
 }

@@ -58,9 +58,9 @@ export function ParakeetModelManager({
         setInitialized(true);
       } catch (err) {
         console.error('Failed to initialize Parakeet:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load models');
-        toast.error('Failed to load transcription models', {
-          description: err instanceof Error ? err.message : 'Unknown error',
+        setError(err instanceof Error ? err.message : '加载模型失败');
+        toast.error('加载转写模型失败', {
+          description: err instanceof Error ? err.message : '未知错误',
           duration: 5000
         });
       } finally {
@@ -133,8 +133,8 @@ export function ParakeetModelManager({
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
 
-          toast.success(`${displayInfo?.icon || '✓'} ${displayName} ready!`, {
-            description: 'Model downloaded and ready to use',
+          toast.success(`${displayInfo?.icon || '✓'} ${displayName} 已就绪！`, {
+            description: '模型已下载完成，可以使用',
             duration: 4000
           });
 
@@ -173,11 +173,11 @@ export function ParakeetModelManager({
           // Clean up throttle data
           progressThrottleRef.current.delete(modelName);
 
-          toast.error(`Failed to download ${displayName}`, {
+          toast.error(`下载 ${displayName} 失败`, {
             description: error,
             duration: 6000,
             action: {
-              label: 'Retry',
+              label: '重试',
               onClick: () => downloadModel(modelName)
             }
           });
@@ -231,13 +231,13 @@ export function ParakeetModelManager({
       // Clean up throttle data
       progressThrottleRef.current.delete(modelName);
 
-      toast.info(`${displayName} download cancelled`, {
+      toast.info(`${displayName} 下载已取消`, {
         duration: 3000
       });
     } catch (err) {
       console.error('Failed to cancel download:', err);
-      toast.error('Failed to cancel download', {
-        description: err instanceof Error ? err.message : 'Unknown error',
+      toast.error('取消下载失败', {
+        description: err instanceof Error ? err.message : '未知错误',
         duration: 4000
       });
     }
@@ -260,8 +260,8 @@ export function ParakeetModelManager({
         )
       );
 
-      toast.info(`Downloading ${displayName}...`, {
-        description: 'This may take a few minutes',
+      toast.info(`正在下载 ${displayName}...`, {
+        description: '这可能需要几分钟，请保持网络连接',
         duration: 5000  // Auto-dismiss after 5 seconds
       });
 
@@ -274,7 +274,7 @@ export function ParakeetModelManager({
         return newSet;
       });
 
-      const errorMessage = err instanceof Error ? err.message : 'Download failed';
+      const errorMessage = err instanceof Error ? err.message : '下载失败';
       setModels(prev =>
         prev.map(model =>
           model.name === modelName ? { ...model, status: { Error: errorMessage } } : model
@@ -294,7 +294,7 @@ export function ParakeetModelManager({
 
     const displayInfo = getModelDisplayInfo(modelName);
     const displayName = displayInfo?.friendlyName || modelName;
-    toast.success(`Switched to ${displayName}`, {
+    toast.success(`已切换到 ${displayName}`, {
       duration: 3000
     });
   };
@@ -310,8 +310,8 @@ export function ParakeetModelManager({
       const modelList = await ParakeetAPI.getAvailableModels();
       setModels(modelList);
 
-      toast.success(`${displayName} deleted`, {
-        description: 'Model removed to free up space',
+      toast.success(`${displayName} 已删除`, {
+        description: '已移除模型以释放空间',
         duration: 3000
       });
 
@@ -321,8 +321,8 @@ export function ParakeetModelManager({
       }
     } catch (err) {
       console.error('Failed to delete model:', err);
-      toast.error(`Failed to delete ${displayName}`, {
-        description: err instanceof Error ? err.message : 'Delete failed',
+      toast.error(`删除 ${displayName} 失败`, {
+        description: err instanceof Error ? err.message : '删除失败',
         duration: 4000
       });
     }
@@ -342,7 +342,7 @@ export function ParakeetModelManager({
   if (error) {
     return (
       <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
-        <p className="text-sm text-red-800">Failed to load models</p>
+        <p className="text-sm text-red-800">加载模型失败</p>
         <p className="text-xs text-red-600 mt-1">{error}</p>
       </div>
     );
@@ -405,7 +405,7 @@ export function ParakeetModelManager({
           animate={{ opacity: 1, y: 0 }}
           className="text-xs text-gray-500 text-center pt-2"
         >
-          Using {getModelDisplayName(selectedModel)} for transcription
+          正在使用 {getModelDisplayName(selectedModel)} 进行转写
         </motion.div>
       )}
     </div>
@@ -473,7 +473,7 @@ function ModelCard({
       {/* Recommended Badge */}
       {isRecommended && (
         <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-          Recommended
+          推荐
         </div>
       )}
 
@@ -505,7 +505,7 @@ function ModelCard({
               <>
                 <div className="flex items-center gap-1.5 text-green-600">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs font-medium">Ready</span>
+                  <span className="text-xs font-medium">就绪</span>
                 </div>
                 <AnimatePresence>
                   {isHovered && (
@@ -519,7 +519,7 @@ function ModelCard({
                         onDelete();
                       }}
                       className="text-gray-400 hover:text-red-600 transition-colors p-1"
-                      title="Delete model to free up space"
+                      title="删除模型以释放空间"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -538,7 +538,7 @@ function ModelCard({
                 }}
                 className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
               >
-                Download
+                下载
               </button>
             )}
 
@@ -550,7 +550,7 @@ function ModelCard({
                 }}
                 className="bg-red-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
               >
-                Retry
+                重试
               </button>
             )}
 
@@ -563,7 +563,7 @@ function ModelCard({
                   }}
                   className="bg-orange-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
                 >
-                  Delete
+                  删除
                 </button>
                 <button
                   onClick={(e) => {
@@ -572,7 +572,7 @@ function ModelCard({
                   }}
                   className="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Re-download
+                  重新下载
                 </button>
               </div>
             )}
@@ -589,7 +589,7 @@ function ModelCard({
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-blue-600">Downloading...</span>
+                <span className="text-sm font-medium text-blue-600">正在下载...</span>
                 <span className="text-sm font-semibold text-blue-600">{Math.round(downloadProgress)}%</span>
               </div>
               <button
@@ -598,9 +598,9 @@ function ModelCard({
                   onCancel();
                 }}
                 className="text-xs text-gray-600 hover:text-red-600 font-medium transition-colors px-2 py-1 rounded hover:bg-red-50"
-                title="Cancel download"
+                title="取消下载"
               >
-                Cancel
+                取消
               </button>
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -617,7 +617,7 @@ function ModelCard({
                   {formatFileSize(model.size_mb * downloadProgress / 100)} / {formatFileSize(model.size_mb)}
                 </>
               ) : (
-                'Downloading...'
+                '正在下载...'
               )}
             </p>
           </motion.div>

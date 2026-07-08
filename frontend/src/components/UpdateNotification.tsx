@@ -23,9 +23,9 @@ export function showUpdateNotification(updateInfo: UpdateInfo, onUpdateClick?: (
       <div className="flex items-center gap-2">
         <Download className="h-4 w-4" />
         <div>
-          <p className="font-medium">Update Available</p>
+          <p className="font-medium">发现可用更新</p>
           <p className="text-sm text-muted-foreground">
-            Version {updateInfo.version} is now available
+            版本 {updateInfo.version} 现已可用
           </p>
         </div>
       </div>
@@ -36,7 +36,7 @@ export function showUpdateNotification(updateInfo: UpdateInfo, onUpdateClick?: (
         }}
         className="text-sm font-medium text-blue-600 hover:text-blue-700 underline"
       >
-        View Details
+        查看详情
       </button>
     </div>,
     {

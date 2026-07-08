@@ -22,7 +22,7 @@ export function ModelDownloadProgress({ status, modelName, onCancel }: ModelDown
         <div className="flex items-center space-x-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
           <span className="text-sm font-medium text-blue-900">
-            {isCompleted ? 'Finalizing...' : `Downloading ${modelName}`}
+            {isCompleted ? '正在完成...' : `正在下载 ${modelName}`}
           </span>
         </div>
       </div>
@@ -35,16 +35,16 @@ export function ModelDownloadProgress({ status, modelName, onCancel }: ModelDown
           />
         </div>
         <div className="flex justify-between text-xs text-blue-700 mt-1">
-          <span>{Math.round(progress)}% complete</span>
+          <span>已完成 {Math.round(progress)}%</span>
           {!isCompleted && (
-            <span className="animate-pulse">Downloading...</span>
+            <span className="animate-pulse">正在下载...</span>
           )}
         </div>
       </div>
       
       {isCompleted && (
         <div className="mt-2 text-xs text-green-700">
-          ✓ Download completed, loading model...
+          ✓ 下载完成，正在加载模型...
         </div>
       )}
     </div>
@@ -114,15 +114,15 @@ export function DownloadSummary({ totalModels, downloadedModels, totalSizeMb }: 
     <div className="bg-gray-50 rounded-lg p-3 text-sm">
       <div className="flex items-center justify-between">
         <span className="text-gray-700">
-          📦 {downloadedModels} of {totalModels} models available
+          📦 已可用 {downloadedModels} / {totalModels} 个模型
         </span>
         <span className="text-gray-600">
-          💾 {formatSize(totalSizeMb)} total
+          💾 共 {formatSize(totalSizeMb)}
         </span>
       </div>
       {downloadedModels > 0 && (
         <div className="mt-1 text-xs text-green-600">
-          ✓ Models run locally - no internet required for transcription
+          ✓ 模型在本机运行，转写时无需联网
         </div>
       )}
     </div>

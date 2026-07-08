@@ -22,8 +22,8 @@ async function resolveSummaryLanguage(
     if (perMeeting.language) return perMeeting.language;
   } catch (err) {
     console.warn('Failed to load meeting summary language:', err);
-    toast.warning('Could not load saved summary language', {
-      description: 'Using Auto for this generation.',
+    toast.warning('无法加载已保存的摘要语言', {
+      description: '本次生成将使用自动模式。',
     });
   }
 
@@ -37,8 +37,8 @@ async function resolveSummaryLanguage(
   try {
     const detection = await detectAndCacheSummaryLanguage(meetingId, transcriptTexts);
     if (detection.reason === 'tie') {
-      toast.warning('Bilingual transcript detected', {
-        description: 'Pick a summary language manually if Auto chooses the wrong fallback.',
+      toast.warning('检测到双语转写内容', {
+        description: '如果自动模式选择不准确，请手动指定摘要语言。',
       });
     }
     return detection.language;
@@ -82,15 +82,15 @@ export function useSummaryGeneration({
   const getSummaryStatusMessage = useCallback((status: SummaryStatus) => {
     switch (status) {
       case 'processing':
-        return 'Processing transcript...';
+        return '正在处理转写内容...';
       case 'summarizing':
-        return 'Generating summary...';
+        return '正在生成摘要...';
       case 'regenerating':
-        return 'Regenerating summary...';
+        return '正在重新生成摘要...';
       case 'completed':
-        return 'Summary completed';
+        return '摘要已完成';
       case 'error':
-        return 'Error generating summary';
+        return '生成摘要出错';
       default:
         return '';
     }
@@ -239,9 +239,9 @@ export function useSummaryGeneration({
             errorMessage.toLowerCase().includes('model') && errorMessage.toLowerCase().includes('required');
 
           // Show error toast
-          toast.error(`Failed to ${isRegeneration ? 'regenerate' : 'generate'} summary`, {
+          toast.error(isRegeneration ? '重新生成摘要失败' : '生成摘要失败', {
             description: errorMessage.includes('Connection refused')
-              ? 'Could not connect to LLM service. Please ensure Ollama or your configured LLM provider is running.'
+              ? '无法连接到 LLM 服务。请确认 Ollama 或已配置的 LLM 服务正在运行。'
               : errorMessage,
           });
 
@@ -278,8 +278,8 @@ export function useSummaryGeneration({
             setSummaryStatus('completed');
 
             // Show success toast
-            toast.success('Summary generated successfully!', {
-              description: 'Your meeting summary is ready',
+            toast.success('摘要已生成', {
+              description: '会议摘要已准备好',
               duration: 4000,
             });
 
@@ -301,7 +301,7 @@ export function useSummaryGeneration({
 
           if (allEmpty) {
             console.error('Summary completed but all sections empty');
-            setSummaryError('Summary generation completed but returned empty content.');
+            setSummaryError('摘要生成已完成，但返回内容为空。');
             setSummaryStatus('error');
 
             await Analytics.trackSummaryGenerationCompleted(
@@ -352,8 +352,8 @@ export function useSummaryGeneration({
           setSummaryStatus('completed');
 
           // Show success toast
-          toast.success('Summary generated successfully!', {
-            description: 'Your meeting summary is ready',
+          toast.success('摘要已生成', {
+            description: '会议摘要已准备好',
             duration: 4000,
           });
 
@@ -375,7 +375,7 @@ export function useSummaryGeneration({
       setSummaryStatus('error');
       // Note: We don't clear the summary here because the backend has already restored from backup
 
-      toast.error(`Failed to ${isRegeneration ? 'regenerate' : 'generate'} summary`, {
+      toast.error(isRegeneration ? '重新生成摘要失败' : '生成摘要失败', {
         description: errorMessage,
       });
 
@@ -500,12 +500,12 @@ export function useSummaryGeneration({
         if (isOllamaNotInstalledError(errorMessage)) {
           // Ollama is not installed - show specific message with download link
           toast.error(
-            'Ollama is not installed',
+            '尚未安装 Ollama',
             {
-              description: 'Please download and install Ollama to use local models.',
+              description: '请先下载并安装 Ollama，才能使用本地模型。',
               duration: 7000,
               action: {
-                label: 'Download',
+                label: '下载',
                 onClick: () => invokeTauri('open_external_url', { url: 'https://ollama.com/download' })
               }
             }
@@ -513,7 +513,7 @@ export function useSummaryGeneration({
         } else {
           // Other error - generic message
           toast.error(
-            'Failed to check Ollama models. Please ensure Ollama is running and download a model from Settings.',
+            '检查 Ollama 模型失败。请确认 Ollama 正在运行，并已在设置中下载模型。',
             { duration: 5000 }
           );
         }
@@ -527,8 +527,8 @@ export function useSummaryGeneration({
         const selectedModel = modelConfig.model;
 
         if (!selectedModel) {
-          toast.error('No built-in AI model selected', {
-            description: 'Please select a model in settings',
+          toast.error('未选择内置 AI 模型', {
+            description: '请先在设置中选择模型',
             duration: 5000,
           });
           if (onOpenModelSettings) {
@@ -553,16 +553,16 @@ export function useSummaryGeneration({
             const status = modelInfo.status;
 
             if (status.type === 'downloading') {
-              toast.info('Model download in progress', {
-                description: `${selectedModel} is downloading (${status.progress}%). Please wait until download completes.`,
+              toast.info('模型正在下载', {
+                description: `${selectedModel} 正在下载（${status.progress}%）。请等待下载完成。`,
                 duration: 5000,
               });
               return;
             }
 
             if (status.type === 'not_downloaded') {
-              toast.error('Built-in AI model not downloaded', {
-                description: `${selectedModel} needs to be downloaded. Please download it in model settings.`,
+              toast.error('内置 AI 模型尚未下载', {
+                description: `${selectedModel} 需要先下载才能使用。请在模型设置中下载它。`,
                 duration: 7000,
               });
               if (onOpenModelSettings) {
@@ -573,10 +573,10 @@ export function useSummaryGeneration({
 
             if (status.type === 'corrupted' || status.type === 'error') {
               const errorDesc = status.type === 'error'
-                ? status.Error || 'The model file has an error'
-                : 'The model file is corrupted';
-              toast.error('Built-in AI model not available', {
-                description: `${errorDesc}. Please check model settings.`,
+                ? status.Error || '模型文件存在错误'
+                : '模型文件已损坏';
+              toast.error('内置 AI 模型不可用', {
+                description: `${errorDesc}。请检查模型设置。`,
                 duration: 7000,
               });
               if (onOpenModelSettings) {
@@ -587,8 +587,8 @@ export function useSummaryGeneration({
           }
 
           // Fallback if we couldn't get model info
-          toast.error('Built-in AI model not ready', {
-            description: 'Please ensure the model is downloaded in settings',
+          toast.error('内置 AI 模型尚未就绪', {
+            description: '请确认已在设置中下载该模型',
             duration: 5000,
           });
           if (onOpenModelSettings) {
@@ -600,7 +600,7 @@ export function useSummaryGeneration({
         // Model is ready, continue to backend call
       } catch (error) {
         console.error('Error validating built-in AI model:', error);
-        toast.error('Failed to validate built-in AI model', {
+        toast.error('验证内置 AI 模型失败', {
           description: error instanceof Error ? error.message : String(error),
           duration: 5000,
         });
@@ -655,8 +655,8 @@ export function useSummaryGeneration({
     setSummaryError(null);
 
     // Show toast notification
-    toast.info('Summary generation stopped', {
-      description: 'You can generate a new summary anytime',
+    toast.info('摘要生成已停止', {
+      description: '你可以随时重新生成摘要',
       duration: 3000,
     });
   }, [meeting.id, stopSummaryPolling]);
