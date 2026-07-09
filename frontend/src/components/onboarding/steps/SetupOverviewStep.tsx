@@ -46,7 +46,7 @@ export function SetupOverviewStep() {
   return (
     <OnboardingContainer
       title="设置概览"
-      description="Meetily 需要先下载转写和摘要 AI 模型，才能完整使用本机会议转写与摘要功能。"
+      description="MinuteFlow 需要先下载转写和摘要 AI 模型，才能完整使用本机会议转写与摘要功能。"
       step={2}
       totalSteps={isMac ? 4 : 3}
     >

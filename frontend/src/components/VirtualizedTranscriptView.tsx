@@ -257,7 +257,7 @@ export const VirtualizedTranscriptView: React.FC<VirtualizedTranscriptViewProps>
                         </>
                     ) : (
                         <>
-                            <p className="text-lg font-semibold">欢迎使用 Meetily！</p>
+                            <p className="text-lg font-semibold">欢迎使用 MinuteFlow！</p>
                             <p className="text-xs mt-1">开始录制后，这里会显示实时转写</p>
                         </>
                     )}

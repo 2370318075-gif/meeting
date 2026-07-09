@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Meetily',
+  title: 'MinuteFlow',
   description: 'AI-powered meeting assistant',
 };

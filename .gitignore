@@ -77,3 +77,4 @@ experiments/
 target/
 
 frontend/src-tauri/binaries/
+frontend/vs_buildtools.exe

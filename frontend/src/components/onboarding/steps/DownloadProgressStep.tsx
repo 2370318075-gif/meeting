@@ -483,7 +483,7 @@ export function DownloadProgressStep() {
   return (
     <OnboardingContainer
       title="正在准备所需组件"
-      description="下载转写引擎后，就可以开始使用 Meetily。"
+      description="下载转写引擎后，就可以开始使用 MinuteFlow。"
       step={3}
       totalSteps={isMac ? 4 : 3}
     >

@@ -114,7 +114,7 @@ export function PermissionsStep() {
   return (
     <OnboardingContainer
       title="授予权限"
-      description="Meetily 需要访问麦克风和系统音频，才能录制会议。"
+      description="MinuteFlow 需要访问麦克风和系统音频，才能录制会议。"
       step={4}
       hideProgress={true}
       showNavigation={allPermissionsGranted}

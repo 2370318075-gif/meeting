@@ -476,7 +476,11 @@ const Sidebar: React.FC = () => {
               <button
                 onClick={handleRecordingToggle}
                 disabled={isRecording}
-                className={`p-2 ${isRecording ? 'bg-red-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'} rounded-full transition-colors duration-150 shadow-sm`}
+                className={`p-2 rounded-full text-white transition-all duration-150 ${
+                  isRecording
+                    ? 'bg-[#FF5A66] cursor-not-allowed shadow-[0_8px_18px_rgba(255,90,102,0.28)]'
+                    : 'bg-[#22B8CF] hover:bg-[#1AA6BC] shadow-[0_8px_18px_rgba(34,184,207,0.28)]'
+                }`}
               >
                 {isRecording ? (
                   <Square className="w-5 h-5 text-white" />
@@ -690,7 +694,7 @@ const Sidebar: React.FC = () => {
             {!isCollapsed && (
               <div className="p-3">
                 {/* <span className="text-lg text-center border rounded-full bg-blue-50 border-white font-semibold text-gray-700 mb-2 block items-center">
-                  <span>Meetily</span>
+                  <span>MinuteFlow</span>
                 </span> */}
                 <Logo isCollapsed={isCollapsed} />
 
@@ -777,7 +781,11 @@ const Sidebar: React.FC = () => {
             <button
               onClick={handleRecordingToggle}
               disabled={isRecording}
-              className={`w-full flex items-center justify-center px-3 py-2 text-sm font-medium text-white ${isRecording ? 'bg-red-300 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'} rounded-lg transition-colors shadow-sm`}
+              className={`w-full flex items-center justify-center px-3 py-2 text-sm font-medium text-white rounded-lg transition-all ${
+                isRecording
+                  ? 'bg-[#FF5A66] cursor-not-allowed shadow-[0_8px_18px_rgba(255,90,102,0.22)]'
+                  : 'bg-[#22B8CF] hover:bg-[#1AA6BC] shadow-[0_8px_18px_rgba(34,184,207,0.24)]'
+              }`}
             >
               {isRecording ? (
                 <>

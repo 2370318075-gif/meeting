@@ -24,7 +24,7 @@ export function WelcomeStep() {
 
   return (
     <OnboardingContainer
-      title="欢迎使用 Meetily"
+      title="欢迎使用 MinuteFlow"
       description="录制、转写、摘要，全部在你的设备上完成。"
       step={1}
       hideProgress={true}
