@@ -1,0 +1,92 @@
+<svg width="1280" height="560" viewBox="0 0 1280 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MinuteFlow 使用流程图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06131C"/>
+      <stop offset="0.52" stop-color="#001020"/>
+      <stop offset="1" stop-color="#000010"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1014 112) rotate(141.34) scale(658 474)">
+      <stop stop-color="#5BBBEF" stop-opacity="0.35"/>
+      <stop offset="0.45" stop-color="#2B8FD8" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#000010" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-80" y="-80" width="1440" height="720" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#2B8FD8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="560" rx="30" fill="url(#bg)"/>
+  <rect width="1280" height="560" rx="30" fill="url(#glow)"/>
+
+  <g opacity="0.16">
+    <path d="M80 80H1200M80 160H1200M80 240H1200M80 320H1200M80 400H1200M80 480H1200" stroke="#78D8FF"/>
+    <path d="M120 48V512M240 48V512M360 48V512M480 48V512M600 48V512M720 48V512M840 48V512M960 48V512M1080 48V512M1200 48V512" stroke="#78D8FF"/>
+  </g>
+
+  <text x="80" y="78" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="650">MinuteFlow 工作流</text>
+  <text x="80" y="112" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="16">从录音到转写、摘要、行动项和导出，围绕会议内容完成一个闭环。</text>
+
+  <g transform="translate(78 162)" filter="url(#shadow)">
+    <rect width="202" height="250" rx="18" fill="#071B28" fill-opacity="0.82" stroke="#2B8FD8" stroke-opacity="0.55"/>
+    <circle cx="52" cy="54" r="26" fill="#0D3042" stroke="#5BBBEF" stroke-opacity="0.7"/>
+    <path d="M52 39C46 39 42 43 42 49V61C42 67 46 71 52 71C58 71 62 67 62 61V49C62 43 58 39 52 39Z" stroke="#78D8FF" stroke-width="4" stroke-linecap="round"/>
+    <path d="M35 58C35 68 42 78 52 78C62 78 69 68 69 58M52 78V88" stroke="#78D8FF" stroke-width="4" stroke-linecap="round"/>
+    <text x="26" y="126" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="650">1. 录制/导入</text>
+    <text x="26" y="160" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">采集麦克风和系统音频，</text>
+    <text x="26" y="184" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">也可以导入已有音频文件。</text>
+  </g>
+
+  <g transform="translate(322 162)" filter="url(#shadow)">
+    <rect width="202" height="250" rx="18" fill="#071B28" fill-opacity="0.82" stroke="#2B8FD8" stroke-opacity="0.55"/>
+    <rect x="28" y="36" width="146" height="54" rx="12" fill="#0D3042" stroke="#5BBBEF" stroke-opacity="0.7"/>
+    <path d="M44 70V58M61 78V50M78 72V56M95 82V46M112 76V52M129 68V60M146 80V48" stroke="#78D8FF" stroke-width="5" stroke-linecap="round"/>
+    <text x="26" y="126" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="650">2. 本地转写</text>
+    <text x="26" y="160" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">在本机完成语音识别，</text>
+    <text x="26" y="184" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">生成带时间戳的逐字稿。</text>
+  </g>
+
+  <g transform="translate(566 162)" filter="url(#shadow)">
+    <rect width="202" height="250" rx="18" fill="#071B28" fill-opacity="0.82" stroke="#2B8FD8" stroke-opacity="0.55"/>
+    <circle cx="48" cy="48" r="14" fill="#5BBBEF"/>
+    <rect x="72" y="39" width="92" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.72"/>
+    <circle cx="48" cy="82" r="14" fill="#2B8FD8"/>
+    <rect x="72" y="73" width="116" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.72"/>
+    <circle cx="48" cy="116" r="14" fill="#5BE49B"/>
+    <rect x="72" y="107" width="76" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.72"/>
+    <text x="26" y="156" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="650">3. 分段整理</text>
+    <text x="26" y="190" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">按时间线查看内容，</text>
+    <text x="26" y="214" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">补充上下文并校正文稿。</text>
+  </g>
+
+  <g transform="translate(810 162)" filter="url(#shadow)">
+    <rect width="202" height="250" rx="18" fill="#071B28" fill-opacity="0.82" stroke="#2B8FD8" stroke-opacity="0.55"/>
+    <path d="M52 34L61 54L82 63L61 72L52 94L43 72L22 63L43 54L52 34Z" fill="#78D8FF"/>
+    <rect x="90" y="48" width="74" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.72"/>
+    <rect x="28" y="118" width="146" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.72"/>
+    <rect x="28" y="146" width="112" height="10" rx="5" fill="#D0E0F0" fill-opacity="0.56"/>
+    <text x="26" y="192" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="650">4. AI 摘要</text>
+    <text x="26" y="226" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">提炼重点、决策和待办，</text>
+  </g>
+
+  <g transform="translate(1054 162)" filter="url(#shadow)">
+    <rect width="202" height="250" rx="18" fill="#071B28" fill-opacity="0.82" stroke="#2B8FD8" stroke-opacity="0.55"/>
+    <path d="M68 42H136V120H68V42Z" stroke="#78D8FF" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M84 64H120M84 84H120M84 104H106" stroke="#D0E0F0" stroke-width="5" stroke-linecap="round"/>
+    <path d="M102 135V164M84 151L102 169L120 151" stroke="#5BE49B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="26" y="206" fill="#F0F4F8" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="650">5. 导出复用</text>
+    <text x="26" y="240" fill="#D0E0F0" font-family="Inter, Arial, sans-serif" font-size="14">复制、保存或分享会议结果。</text>
+  </g>
+
+  <g stroke="#5BBBEF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
+    <path d="M292 287H312"/>
+    <path d="M306 280L314 287L306 294"/>
+    <path d="M536 287H556"/>
+    <path d="M550 280L558 287L550 294"/>
+    <path d="M780 287H800"/>
+    <path d="M794 280L802 287L794 294"/>
+    <path d="M1024 287H1044"/>
+    <path d="M1038 280L1046 287L1038 294"/>
+  </g>
+
+  <text x="80" y="484" fill="#7A8B96" font-family="Inter, Arial, sans-serif" font-size="14">提示：流程图是 README 展示图，实际界面会根据系统、模型配置和会议数据动态变化。</text>
+</svg>
